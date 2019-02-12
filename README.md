@@ -7,7 +7,7 @@ A GitHub action to automatically create new PR based on target branch.
 ```
 workflow "on pull request merge, delete the branch" {
   on = "pull_request"
-  resolves = ["branch cleanup"]
+  resolves = ["branch replicator"]
 }
 
 action "branch replicator" {
@@ -21,6 +21,7 @@ action "branch replicator" {
 ```
 
 `SRC_BRANCH` is for branch that you make PR into
+
 `T_BRANCH` is the target branch that github action makes copy
 
 ## Contributing
