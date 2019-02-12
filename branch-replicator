@@ -1,0 +1,63 @@
+#!/bin/bash
+set -e
+set -o pipefail
+
+SOURCE_BRANCH="staging"
+BASE_BRANCH="development"
+
+if [[ ! -z "$TOKEN" ]]; then
+	GITHUB_TOKEN=$TOKEN
+fi
+
+if [[ ! -z "$SRC_BRANCH" ]]; then
+	SOURCE_BRANCH=$SRC_BRANCH
+fi
+
+if [[ ! -z "$T_BRANCH" ]]; then
+	BASE_BRANCH=$T_BRANCH
+fi
+
+if [[ -z "$GITHUB_TOKEN" ]]; then
+	echo "Set the GITHUB_TOKEN env variable."
+	exit 1
+fi
+
+if [[ -z "$GITHUB_REPOSITORY" ]]; then
+	echo "Set the GITHUB_REPOSITORY env variable."
+	exit 1
+fi
+
+URI=https://api.github.com
+API_VERSION=v3
+API_HEADER="Accept: application/vnd.github.${API_VERSION}+json"
+AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
+
+main(){
+	action=$(jq --raw-output .action "$GITHUB_EVENT_PATH")
+	target_branch=$(jq --raw-output .pull_request.base.ref "$GITHUB_EVENT_PATH")
+
+	echo "DEBUG -> action: $action branch: $target_branch"
+
+	if [[ "$action" == "open" ]] && [[ "$target_branch" == "$SOURCE_BRANCH" ]]; then
+		# create new PR to target branch.
+		ref=$(jq --raw-output .pull_request.head.ref "$GITHUB_EVENT_PATH")
+		owner=$(jq --raw-output .pull_request.head.repo.owner.login "$GITHUB_EVENT_PATH")
+		repo=$(jq --raw-output .pull_request.head.repo.name "$GITHUB_EVENT_PATH")
+		jsonstr=$(jq -n \
+					--arg tl "auto branch creator" \
+					--arg bs "$BASE_BRANCH" \
+					--arg hd "$ref" \
+					'{title: $tl, head: $hd, base: $bs}' )
+
+		url=$(
+ 			curl -XPOST -sSL \
+				-H "${AUTH_HEADER}" \
+ 				-H "${API_HEADER}" \
+				-d "$jsonstr"
+				"${URI}/repos/${owner}/${repo}/pulls" | jq .url
+		)
+		echo "$url"
+	fi
+}
+
+main "$@"
