@@ -50,17 +50,12 @@ main(){
 					--arg bs "$BASE_BRANCH" \
 					--arg hd "$ref" \
 					'{title: $tl, head: $hd, base: $bs}' )
-		
-		echo "$AUTH_HEADER"		
-		echo "$API_HEADER"		
-		echo "$jsonstr"
-		echo "${URI}/repos/${owner}/${repo}/pulls"
-		
+					
 		url=$(
  			curl -XPOST -sSL \
 				-H "${AUTH_HEADER}" \
  				-H "${API_HEADER}" \
-				-d "$jsonstr"
+				-d "$jsonstr" \
 				"${URI}/repos/${owner}/${repo}/pulls" | jq .url
 		)
 		echo "$url"
