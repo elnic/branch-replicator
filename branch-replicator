@@ -39,7 +39,7 @@ main(){
 	echo "DEBUG -> action: $action branch: $target_branch"
 	echo "DEBUG -> target branch: $SOURCE_BRANCH"
 
-	if [[ "$action" == "open" ]] && [[ "$target_branch" == "$SOURCE_BRANCH" ]]; then
+	if [[ "$action" == "opened" ]] && [[ "$target_branch" == "$SOURCE_BRANCH" ]]; then
 		echo "Replicating...."
 		# create new PR to target branch.
 		ref=$(jq --raw-output .pull_request.head.ref "$GITHUB_EVENT_PATH")
