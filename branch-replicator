@@ -51,14 +51,14 @@ main(){
 					--arg hd "$ref" \
 					'{title: $tl, head: $hd, base: $bs}' )
 					
-		url=$(
- 			curl -XPOST -sSL \
-				-H "${AUTH_HEADER}" \
- 				-H "${API_HEADER}" \
-				-d "$jsonstr" \
-				"${URI}/repos/${owner}/${repo}/pulls" | jq .url
-		)
-		echo "$url"
+		#url=$(
+ 		#	curl -XPOST -sSL \
+		#		-H "${AUTH_HEADER}" \
+ 		#		-H "${API_HEADER}" \
+		#		-d "$jsonstr" \
+		#		"${URI}/repos/${owner}/${repo}/pulls" | jq .url
+		#)
+		#echo "$url"
 	fi
 }
 
